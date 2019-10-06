@@ -1,0 +1,22 @@
+{# Notepage  index.html.twig #}
+<h2>{{ title }}</h2>
+{% if topics|length > 0 %}Topics{% else %}This topic is empty...{% endif %}
+<ul>
+    {% for topic in topics %}
+        <li><a href="{{ path('note_topic', {id: topic.id}) }}">{{ topic.title }}</a></li>
+    {% endfor %}
+</ul>
+Options
+<ul>
+    {% if backId > 0 %}
+        <li><a href="{{ path('note_topic', {id: backId}) }}">Back</a></li>
+    {% endif %}
+    <li><a href="{{ path('note_topic_create', {id: id}) }}">Add sub-topic</a></li>
+    {% if topics|length == 0 %}
+    <li><a href="{{ path('note_create', {id: id, type: 'intro'}) }}">Add notes</a></li>
+    {% endif %}
+    {% if backId > 0 %}
+    <li><a href="{{ path('note_remove_topic', {id: id}) }}">Remove this topic</a></li>
+    {% endif
+    %}
+</ul>

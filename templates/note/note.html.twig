@@ -1,0 +1,26 @@
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+{% if notes|length == 0 %}No notes here!{% endif %}
+{% for note in notes %}
+    {% if note.type == 'intro' %}
+        <h2>{{ note.title }}</h2>
+        <p>{{ note.content }}</p>
+        <hr>
+    {% endif %}
+{% endfor %}
+{% for note in notes %}
+    {% if note.type == 'definition' %}
+        <p><b>{{ note.title }}</b>:
+        {{ note.content }}</p>
+    {% endif %}
+    {% if note.type == 'img' %}
+    <img src="{{ asset('uploads/image_uploads/' ~ note.content) }}" alt="{{ note.content }}"/>
+    {% endif %}
+{% endfor %}
+<ul>
+    <li><a href="{{ path('note_create', {id: id, type:'definition'}) }}">Add a definition</a></li>
+    <li><a href="{{ path('note_create', {id: id, type:'img'}) }}">Add a image</a></li>
+    <li><a href="{{ path('note_topic', {id: id}) }}">Back</a></li>
+</ul>
+Test $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
