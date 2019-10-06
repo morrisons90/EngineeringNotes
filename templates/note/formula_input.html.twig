@@ -1,0 +1,14 @@
+{{ form(form) }}
+<script id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+<script>
+    function previewMaths() {
+        document.getElementById("prev-math").innerHTML = "$$" + document.getElementById("form_content").value + "$$";
+        MathJax.typeset();
+    }
+</script>
+<button onclick="previewMaths()">Preview</button>
+<div id="prev-math">
+
+</div>

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+
 /**
  * @Gedmo\Tree(type="nested")
  * @ORM\Table(name="topic")
@@ -139,18 +140,6 @@ class Topic
         return $this;
     }
 
-    public function getParent(): ?Topic
-    {
-        return $this->parent;
-    }
-
-    public function setParent(?Topic $parent): self
-    {
-        $this->parent = $parent;
-
-        return $this;
-    }
-
     /**
      * @return Collection|Topic[]
      */
@@ -178,6 +167,18 @@ class Topic
                 $child->setParent(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getParent(): ?Topic
+    {
+        return $this->parent;
+    }
+
+    public function setParent(?Topic $parent): self
+    {
+        $this->parent = $parent;
 
         return $this;
     }
