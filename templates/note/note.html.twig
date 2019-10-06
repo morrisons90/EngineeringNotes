@@ -12,15 +12,21 @@
 {% for note in notes %}
     {% if note.type == 'definition' %}
         <p><b>{{ note.title }}</b>:
-        {{ note.content }}</p>
+            {{ note.content }}</p>
     {% endif %}
     {% if note.type == 'img' %}
-    <img src="{{ asset('uploads/image_uploads/' ~ note.content) }}" alt="{{ note.content }}"/>
+        <img height="200px" src="{{ asset('uploads/image_uploads/' ~ note.content) }}" alt="{{ note.content }}"/>
+    {% endif %}
+    {% if note.type == 'formula' %}
+        <p style="text-align: left !important;">
+            {{ note.title }}
+            $${{ note.content }}$$
+        </p>
     {% endif %}
 {% endfor %}
 <ul>
     <li><a href="{{ path('note_create', {id: id, type:'definition'}) }}">Add a definition</a></li>
+    <li><a href="{{ path('note_create', {id: id, type:'formula'}) }}">Add a formula</a></li>
     <li><a href="{{ path('note_create', {id: id, type:'img'}) }}">Add a image</a></li>
-    <li><a href="{{ path('note_topic', {id: id}) }}">Back</a></li>
+    <li><a href="{{ path('note_topic', {id: back}) }}">Back</a></li>
 </ul>
-Test $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$

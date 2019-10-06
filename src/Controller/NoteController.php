@@ -40,11 +40,13 @@ class NoteController extends AbstractController
             throw $this->createNotFoundException("Page " . $id . " not found");
         }
 
-        if(count($topic->getNotes()) > 0){
+        if (count($topic->getNotes()) > 0) {
             $notes = $topic->getNotes();
+            $back = $topic->getParent()->getId();
             return $this->render('note/note.html.twig', [
                 'notes' => $notes,
                 'id' => $id,
+                'back' => $back,
             ]);
         }
 
@@ -87,7 +89,7 @@ class NoteController extends AbstractController
 
         //Setup form
         $form = $this->createFormBuilder($topic)
-            ->add('title', TextType::class, ['attr'=>['autocomplete' => null]])
+            ->add('title', TextType::class, ['attr' => ['autocomplete' => null]])
             ->add('submit', SubmitType::class, ['label' => 'Create topic'])
             ->getForm();
 
@@ -118,10 +120,14 @@ class NoteController extends AbstractController
         $note = new Note();
         $note->setTopic($topic);
         $note->setType($type);
-        switch($type){
-            case "img": {
+
+        $formTemplate = "note/create.html.twig";
+
+        switch ($type) {
+            case "img":
+            {
                 $form = $this->createFormBuilder($note)
-                    ->add('title', TextType::class, ['required' => true, 'attr'=>['autocomplete' => null]])
+                    ->add('title', TextType::class, ['required' => true, 'attr' => ['autocomplete' => null]])
                     ->add('content', FileType::class, [
                         'required' => true,
                         'mapped' => false,
@@ -136,16 +142,21 @@ class NoteController extends AbstractController
                             ])
                         ]
                     ])
-                    ->add('submit', SubmitType::class, ['label' => 'Create note'])
+                    ->add('submit', SubmitType::class, ['label' => 'Add image'])
                     ->getForm();
                 echo $type;
                 break;
             }
-            default: {
+            case "formula":
+            {
+                $formTemplate = "note/formula_input.html.twig";
+            }
+            default:
+            {
                 $form = $this->createFormBuilder($note)
-                    ->add('title', TextType::class, ['required' => false, 'attr'=>['autocomplete' => null]])
-                    ->add('content', TextType::class, ['required' => true, 'attr'=>['autocomplete' => null]])
-                    ->add('submit', SubmitType::class, ['label' => 'Create note'])
+                    ->add('title', TextType::class, ['required' => false, 'attr' => ['autocomplete' => null]])
+                    ->add('content', TextType::class, ['required' => true, 'attr' => ['autocomplete' => null]])
+                    ->add('submit', SubmitType::class, ['label' => 'Add content'])
                     ->getForm();
                 break;
             }
@@ -155,9 +166,9 @@ class NoteController extends AbstractController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $note = $form->getData();
-            if($type == "img"){
+            if ($type == "img") {
                 $imageFile = $form['content']->getData();
-                if($imageFile){
+                if ($imageFile) {
                     $imageFileName = $fileUploader->upload($imageFile);
                     $note->setContent($imageFileName);
                 }
@@ -168,7 +179,7 @@ class NoteController extends AbstractController
             $entityManager->flush();
             return $this->redirectToRoute('note_topic', ['id' => $id]);
         }
-        return $this->render('note/create.html.twig', ['form' => $form->createView()]);
+        return $this->render($formTemplate, ['form' => $form->createView()]);
     }
 
     /**
@@ -176,7 +187,8 @@ class NoteController extends AbstractController
      * @param $id
      * @return RedirectResponse
      */
-    public function removeTopic($id){
+    public function removeTopic($id)
+    {
         $em = $this->getDoctrine()->getManager();
         $repo = $this->getDoctrine()->getRepository("App:Topic");
         $topic = $repo->find($id);
@@ -184,7 +196,7 @@ class NoteController extends AbstractController
         $repo->removeFromTree($topic);
         $em->clear();
 
-        return $this->redirectToRoute('note_topic',[
+        return $this->redirectToRoute('note_topic', [
             'id' => $returnId,
         ]);
     }
