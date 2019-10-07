@@ -23,10 +23,18 @@
             $${{ note.content }}$$
         </p>
     {% endif %}
+    {% if note.type == 'text' %}
+        <h3>{{ note.title }}</h3>
+        <p>{{ note.content }}</p>
+    {% endif %}
 {% endfor %}
 <ul>
     <li><a href="{{ path('note_create', {id: id, type:'definition'}) }}">Add a definition</a></li>
     <li><a href="{{ path('note_create', {id: id, type:'formula'}) }}">Add a formula</a></li>
-    <li><a href="{{ path('note_create', {id: id, type:'img'}) }}">Add a image</a></li>
+    <li><a href="{{ path('note_create', {id: id, type:'img'}) }}">Add an image</a></li>
+    <li><a href="{{ path('note_create', {id: id, type:'text'}) }}">Add text</a></li>
     <li><a href="{{ path('note_topic', {id: back}) }}">Back</a></li>
 </ul>
+<div>
+    <a href="{{ path('note_remove_topic', {'id': id}) }}">Remove these notes</a>
+</div>
