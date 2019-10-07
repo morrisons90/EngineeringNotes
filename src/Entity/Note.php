@@ -18,7 +18,7 @@ class Note
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\topic", inversedBy="notes")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(name="topic", nullable=false,referencedColumnName="id", onDelete="CASCADE")
      */
     private $topic;
 

@@ -3,12 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Note;
-use App\Entity\NoteModule;
-use App\Entity\NoteTopic;
 use App\Entity\Topic;
 use App\Services\FileUploader;
-use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -17,8 +15,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints\File;
-use Twig\Tests\ToStringStub;
-use function MongoDB\BSON\toJSON;
 
 class NoteController extends AbstractController
 {
@@ -91,6 +87,13 @@ class NoteController extends AbstractController
         $form = $this->createFormBuilder($topic)
             ->add('title', TextType::class, ['attr' => ['autocomplete' => null]])
             ->add('submit', SubmitType::class, ['label' => 'Create topic'])
+            ->add('enterNew', CheckboxType::class, [
+                'mapped' => false,
+                'label' => "Open new topic after creation",
+                'value' => true,
+                'attr' => ['checked' => 'checked'],
+                'required' => false,
+            ])
             ->getForm();
 
         //process form
@@ -100,7 +103,11 @@ class NoteController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($topic);
             $entityManager->flush();
-            return $this->redirectToRoute('note_topic', ['id' => $id]);
+            $topicId = $topic->getId();
+            if (!$topicId || !$form['enterNew']->getData()) {
+                $topicId = $id;
+            }
+            return $this->redirectToRoute('note_topic', ['id' => $topicId]);
         }
 
         return $this->render('note/create.html.twig', ['form' => $form->createView()]);
@@ -115,12 +122,7 @@ class NoteController extends AbstractController
      */
     public function createNote($id, $type, Request $request, FileUploader $fileUploader)
     {
-        $topic = $this->getDoctrine()->getManager()->getRepository("App:Topic")->find($id);
-
         $note = new Note();
-        $note->setTopic($topic);
-        $note->setType($type);
-
         $formTemplate = "note/create.html.twig";
 
         switch ($type) {
@@ -163,6 +165,9 @@ class NoteController extends AbstractController
 
         }
 
+
+        $note->setType($type);
+
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $note = $form->getData();
@@ -175,6 +180,17 @@ class NoteController extends AbstractController
 
             }
             $entityManager = $this->getDoctrine()->getManager();
+            if ($type == "intro") {
+                $topic = new Topic();
+                $topic->setParent($this->getDoctrine()->getManager()->getRepository("App:Topic")->find($id));
+                $topic->setTitle($note->getTitle());
+                $entityManager->persist($topic);
+            } else {
+                $topic = $this->getDoctrine()->getManager()->getRepository("App:Topic")->find($id);
+            }
+
+            $note->setTopic($topic);
+
             $entityManager->persist($note);
             $entityManager->flush();
             return $this->redirectToRoute('note_topic', ['id' => $id]);
@@ -185,20 +201,25 @@ class NoteController extends AbstractController
     /**
      * @Route("note/remove_topic/{id}",name="note_remove_topic")
      * @param $id
-     * @return RedirectResponse
+     * @return RedirectResponse|Response
      */
-    public function removeTopic($id)
+    public function removeTopic($id, Request $request)
     {
-        $em = $this->getDoctrine()->getManager();
-        $repo = $this->getDoctrine()->getRepository("App:Topic");
-        $topic = $repo->find($id);
-        $returnId = $topic->getParent()->getID();
-        $repo->removeFromTree($topic);
-        $em->clear();
+        if ($request->query->get("confirm")) {
+            $em = $this->getDoctrine()->getManager();
+            $repo = $this->getDoctrine()->getRepository("App:Topic");
+            $topic = $repo->find($id);
+            $returnId = $topic->getParent()->getID();
+            $repo->removeFromTree($topic);
+            $em->flush();
+            $em->clear();
 
-        return $this->redirectToRoute('note_topic', [
-            'id' => $returnId,
-        ]);
+            return $this->redirectToRoute('note_topic', [
+                'id' => $returnId,
+            ]);
+        } else {
+            return new Response("<html><body><a href='?confirm=true'>Click to remove topic and all subtopics and notes within it...</body></html>");
+        }
     }
 
 }
