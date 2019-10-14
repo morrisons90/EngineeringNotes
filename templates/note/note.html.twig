@@ -1,6 +1,11 @@
 <script id="MathJax-script" async
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
 </script>
+<style>
+    mjx-container {
+        text-align: left !important;
+    }
+</style>
 {% if notes|length == 0 %}No notes here!{% endif %}
 {% for note in notes %}
     {% if note.type == 'intro' %}
@@ -18,7 +23,7 @@
         <img height="200px" src="{{ asset('uploads/image_uploads/' ~ note.content) }}" alt="{{ note.content }}"/>
     {% endif %}
     {% if note.type == 'formula' %}
-        <p style="text-align: left !important;">
+        <p>
             {{ note.title }}
             $${{ note.content }}$$
         </p>
