@@ -4,7 +4,7 @@
     "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
     "This file is @generated automatically"
   ],
-  "content-hash": "a8bd45fd6fb1604d579fad5db5407268",
+  "content-hash": "4e69e370bc86f22ddbe5c40b9ec42965",
   "packages": [
     {
       "name": "behat/transliterator",
@@ -2253,7 +2253,7 @@
     },
     {
       "name": "symfony/apache-pack",
-      "version": "v1.0.1",
+      "version": "dev-master",
       "source": {
         "type": "git",
         "url": "https://github.com/symfony/apache-pack.git",
@@ -7062,6 +7062,7 @@
   "minimum-stability": "dev",
   "stability-flags": {
     "stof/doctrine-extensions-bundle": 20,
+    "symfony/apache-pack": 20,
     "symfony/web-server-bundle": 20,
     "doctrine/doctrine-fixtures-bundle": 20
   },
