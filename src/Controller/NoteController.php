@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\File;
 class NoteController extends AbstractController
 {
     /**
-     * @Route("/note/{id}", name="note_topic", defaults={"id"=3})
+     * @Route("/note/{id}", name="note_topic", defaults={"id"=35})
      * @param $id
      * @return Response
      */
@@ -220,6 +220,14 @@ class NoteController extends AbstractController
         } else {
             return new Response("<html><body><a href='?confirm=true'>Click to remove topic and all subtopics and notes within it...</body></html>");
         }
+    }
+
+    /**
+     * @Route("",name="test_route")
+     */
+    public function testPage()
+    {
+        return $this->render('test.html.twig');
     }
 
 }
